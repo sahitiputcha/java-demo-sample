@@ -1,26 +1,13 @@
 tasks:
-
-  unit-test:
-
+  hello-job:
     runner: razorci/openjdk:11-buster
-
     steps:
-
+    - git --version
     - checkout
-
-    - commands:
-
-      - |
-
-        mvn clean package
-
-           ls -a
-
-    - docker/build:
-
-         image: razoropscode.jfrog.io/docker/spring
-
-         push: true 
-
-         tags: ["latest-v1"]
-
+    - cache/pull:
+        key: maven-repo-{{ checksum "pom.xml" }}
+        fallback_key: maven-repo-
+        
+    - run: mvn clean test
+    - reports/junit: 
+      - target/surefire-reports/TEST-*.xml
